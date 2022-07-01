@@ -1,0 +1,163 @@
+openapi: 3.0.1
+info:
+  title: Candlepin
+  description: "Server for fake Candlepin application"
+  contact:
+    email: joseph.stone@dataductus.com
+  license:
+    name: MIT
+  version: 1.0.0
+paths:
+  /games:
+    get:
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Query for games
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+  /game/{game_id}:
+    delete:
+      responses:
+        204:
+          description: Game restarted
+        404:
+          description: Game not found
+  /game/{game_id}/roll:
+    put:
+      parameters:
+        - name: game_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              required:
+                - downed
+              properties:
+                downed:
+                  type: number
+                  minimum: 0
+                  maximum: 10
+      responses:
+        204:
+          description: Roll successfully added to the game
+        400:
+          description: Bad Request - likely missing the "downed" property OR the provided number is invalid
+        409:
+          description: Game is already completed - rolls are not allowed
+components:
+  schemas:
+    Player:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    Mark:
+      type: string
+      nullable: true
+      enum:
+        - spare
+        - strike
+        - ten
+    Frame:
+      type: object
+      required:
+        - downed
+        - number
+        - ball
+        - active
+        - complete
+        - players
+      properties:
+        players:
+          type: array
+          items:
+            type: object
+            required:
+              - player
+              - active
+              - downed
+              - ball
+            properties:
+              player:
+                type: string
+                description: Player Name
+              mark:
+                $ref: "#/components/schemas/Mark"
+                default: null
+                nullable: true
+              downed:
+                type: array
+                items:
+                  type: number
+                  minimum: 0
+                  default: 0
+                  maxLength: 3
+              ball:
+                type: number
+                minimum: 1
+                maximum: 3
+                default: 1
+              active:
+                type: boolean
+                default: false
+        complete:
+          type: boolean
+          default: false
+        active:
+          type: boolean
+          default: false
+        number:
+          type: number
+          minimum: 1
+          maximum: 10
+          default: 1
+    Frames:
+      type: array
+      description: An array of Frame objects in chronological order (e.g. index 0, is Frame 1, and index 9 is Frame 10 - the last frame)
+      items:
+        $ref: "#/components/schemas/Frame"
+    Game:
+      type: object
+      required:
+        - id
+        - lane
+        - frames
+      properties:
+        started:
+          type: string
+          format: date-time
+        completed:
+          type: string
+          format: date-time
+        id:
+          type: string
+          format: uuid
+        lane:
+          type: number
+          minimum: 1
+          maximum: 16
+        frames:
+          $ref: "#/components/schemas/Frames"
+        currentFrame:
+          $ref: "#/components/schemas/Frame"
+          nullable: true
