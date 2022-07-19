@@ -24,7 +24,7 @@
   "scripts": {
     "start": "npm-run-all --parallel react nodemon",
     "react": "react-scripts start",
-    "nodemon": "nodemon --watch './server/**/*.ts' --exec 'node --experimental-specifier-resolution=node --loader ts-node/esm' server/index.ts",
+    "nodemon": "nodemon --watch './server/**/*.ts' --exec node --experimental-specifier-resolution=node --loader ts-node/esm server/index.ts",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
