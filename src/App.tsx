@@ -1,11 +1,12 @@
 import { Component, ReactElement } from 'react';
 import './App.css';
 import { DefaultApi, Game } from './swagger-generated-client'; 
+import Timer from './componets/timer';
 
 export interface AppState {
   id: string;
   game: Game;
-  timer: number;
+  timer: string;
 }
 
 export class App extends Component<{}, AppState> {
@@ -22,20 +23,33 @@ export class App extends Component<{}, AppState> {
         lane: 1,
         started: new Date(),
       },
-      timer: 0, 
+      timer: '', 
     };
   }
 
   componentDidMount() {
     this.#client.gamesGet(this.state.id)
-    .then(res => this.setState({game: res[0]}))
+    .then(res => {
+      this.setState({game: res[0]});
+    }
+    )
     .catch(err => console.error(err))
+  }
+
+  updateTimer(cb:(date:Date)=>string) {
+    const date = this.state.game.started;
+    const startDate = typeof date === 'string' ? new Date(date) : date === undefined ? new Date() : date;
+    const time = cb(startDate);
+
+    this.setState({timer: time})
   }
   
   
   render(): ReactElement {
+    const {timer, game:{ id } } = this.state;
     return (
       <div>
+        <Timer timer={timer} updateTimer={this.updateTimer.bind(this)} gameId={id}/>
       </div>
     );
   }
