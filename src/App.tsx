@@ -1,55 +1,84 @@
 import { Component, ReactElement } from 'react';
 import './App.css';
-import { DefaultApi, Game } from './swagger-generated-client'; 
+import { DefaultApi, Game, FramePlayers } from './swagger-generated-client'; 
 import Timer from './componets/timer';
+import PlayersCom from './componets/player';
+import FramesCom from './componets/frames';
 
 export interface AppState {
   id: string;
+  players:string[];
   game: Game;
-  timer: string;
+  timer: {secs:number; mins:number};
 }
 
 export class App extends Component<{}, AppState> {
   #client: DefaultApi = new DefaultApi({}, 'http://localhost:3123');
-
+  private timerID: any;
   constructor(props:any) {
     super(props);
     this.state = {
       id: "0c39b11a-1123-44b5-ba74-72de7d5922fc",
+      players: [],
       game: {
-        completed: new Date(),
-        frames: [],
-        id: "",
+        id:"",
+        frames: [{ 
+          active: true, 
+          complete: false, 
+          number: 1, 
+          players:[{ player: "", mark: undefined, downed: [], ball: 0, active: false }] 
+        }],
         lane: 1,
-        started: new Date(),
       },
-      timer: '', 
+      timer: {secs:0, mins:0}
     };
   }
 
-  componentDidMount() {
-    this.#client.gamesGet(this.state.id)
-    .then(res => {
-      this.setState({game: res[0]});
-    }
-    )
-    .catch(err => console.error(err))
+  counter = () => {
+    const secs = this.state.timer.secs;
+    const mins = this.state.timer.mins;
+    const timer = secs === 59 ? {secs: 0, mins: mins + 1} : {secs: secs + 1, mins: mins}
+
+    this.setState({timer});
   }
 
-  updateTimer(cb:(date:Date)=>string) {
-    const date = this.state.game.started;
-    const startDate = typeof date === 'string' ? new Date(date) : date === undefined ? new Date() : date;
-    const time = cb(startDate);
+  componentDidMount() {
+    this.timerID = setInterval(
+      () => this.counter(),
+      1000
+    );
+    this.#client.gamesGet(this.state.id)
+    .then(res => {
+      const body = res[0];
+      let players: string[] = [];
+      body.frames[0].players.forEach(player => {const name = player.player; players.push(name)});
+      let game = {
+        id: body.id,
+        players: players,
+        frames: body.frames,
+        lane: body.lane,
+      }
+      this.setState({game, players});
+    })
+    .catch(err => console.error(err));
+  }
 
-    this.setState({timer: time})
+  componentWillUnmount() {
+    clearInterval(this.timerID);
   }
   
   
   render(): ReactElement {
-    const {timer, game:{ id } } = this.state;
+    const { players, game:{ frames, lane }, timer } = this.state;
+    const activeFrame = frames.find(frame => frame.active);
+    const backup: FramePlayers = { player:''}
     return (
       <div>
-        <Timer timer={timer} updateTimer={this.updateTimer.bind(this)} gameId={id}/>
+        <Timer lane={lane} timer={timer}/>
+        <div>
+          <PlayersCom players={players} frame={activeFrame ? activeFrame.players : [backup]}/>
+          <FramesCom frames={frames}/>
+        </div>
       </div>
     );
   }

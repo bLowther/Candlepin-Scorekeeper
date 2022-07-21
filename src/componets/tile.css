@@ -1,0 +1,12 @@
+.ten, .spare, .strike {
+  border-style: solid;
+  height: 5vw;
+}
+
+.spare {
+  background: linear-gradient(135deg, black 5%, white 0)
+}
+
+.strike {
+  background: linear-gradient(135deg, black 5%, white 0, white 94%, black 1%)
+}
