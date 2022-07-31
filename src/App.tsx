@@ -64,18 +64,18 @@ export class App extends Component<{}, AppState> {
           if (frame.active) active.activeFrame = frame.number;
           const thisPlayer = frame.players.find(player => player.player === name);
           if(thisPlayer?.active) active.activePlayer = thisPlayer.player;
-          const rolls = thisPlayer?.downed ? thisPlayer?.downed : [];
-          const downed = rolls.reduce((total,  down ) => total + down, 0);
+          const downed = thisPlayer?.downed ? thisPlayer?.downed : [];
           const completed = frame.complete;
           const mark = (thisPlayer?.mark ? thisPlayer.mark.toString() : null) as Mark;
           let newFrame = new Frame(frame.number,{ downed, completed, mark });
-          newFrame.ball = rolls.length;
+          newFrame.ball = downed.length;
           newFrame.active = frame.active;
           framesArray.push(newFrame);
         })
         const frames = new Frames(framesArray);
         players.push(new Player(name, frames));
       });
+      players.forEach(player=>player.total());
       let game = {
         id: body.id,
         frames: body.frames,
@@ -108,7 +108,7 @@ export class App extends Component<{}, AppState> {
               )) /**This needs to be pulled out into own componet and styled */}
             </div>
               {players.map(player=>(
-               <PlayersCom player={player} activePlayer={activePlayer} key={player.name}/>
+               <PlayersCom player={player} activePlayer={activePlayer} key={player.name} />
               ))}
             </div>
           </div>

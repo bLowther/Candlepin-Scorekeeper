@@ -35,7 +35,6 @@ interface PlayersProps {
 
 const PlayersCom: React.FC<PlayersProps> = ({player, activePlayer }) => {
   const isActivePlayer = activePlayer === player.name;
-
   return (
     <div className={"col"}>
       <div className={isActivePlayer ? 'activePlayer' : 'player'}>

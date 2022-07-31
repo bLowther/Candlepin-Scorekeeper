@@ -27,16 +27,22 @@ const FrameCom: React.FC<{frame: Frame, isActivePlayer:boolean}> = ({frame, isAc
   const ball = frame.ball ? frame.ball : 0;
   return (
     <div>
-      {frame.mark === 'strike' ?
+      {frame.number === 1 ?
           <div className={"row"}>
-            <Tile score={0} mark={frame.mark} active={frame.active && isActivePlayer} />
-            <Tile score={0} mark={"ten"} active={frame.active && isActivePlayer}/>
+            <Tile score={0} mark={"ten"} active={frame.active && isActivePlayer} />
+            <Tile score={frame.total} mark={frame.mark} active={frame.active && isActivePlayer}/>
           </div>
         :
-        <div className={"row"}>
-            <Tile score={frame.downed} mark={"ten"} active={frame.active && ball === 0 && isActivePlayer} />
-            <Tile score={0} mark={frame.mark} active={frame.active  && ball > 0 && isActivePlayer}/>
-        </div>
+        frame.mark === 'strike' || frame.mark === 'spare' ?
+          <div className={"row"}>
+            <Tile score={0} mark={frame.mark} active={false} />
+            <Tile score={frame.total} mark={"ten"} active={false}/>
+          </div>
+        :
+      <div className={"row"}>
+          <Tile score={frame.score} mark={"ten"} active={frame.active && ball === 0 && isActivePlayer} />
+          <Tile score={frame.total} mark={frame.mark} active={frame.active && ball > 0 && isActivePlayer}/>
+      </div>
       }
     </div>  
   );

@@ -6,22 +6,27 @@ export interface Listeners {
 
 export class Frame {
   number: number = 0;
-  downed: number = 0;
+  total: number = 0;
+  downed: number[] = [];
   complete: boolean = false;
   mark: Mark;
   active: boolean = false;
   ball?: number = 1;
 
-  constructor(number: number, opts?: { downed: number, completed: boolean, mark: Mark }) {
+  constructor(number: number, opts?: { downed: number[], completed: boolean, mark: Mark }) {
     this.number = number;
-    this.downed = opts?.downed || 0;
+    this.downed = opts?.downed || [];
     this.complete = opts?.completed || false;
     this.mark = opts?.mark as Mark;
   }
 
+  get score(): number {
+    return this.downed.reduce((total,  down ) => total + down, 0);
+  }
+
   reset(): void {
     this.complete = false;
-    this.downed = 0;
+    this.downed = [];
     this.mark = null;
   }
 }
@@ -33,9 +38,13 @@ export class Frames {
     return Array.from(this.#frames);
   }
 
-  get score(): number {
-    return this.frames.filter(({ complete: completed }) => completed).reduce((total, { downed }) => total + downed, 0);
+  get completed(): Frame[] {
+    return this.frames.filter(({ downed, mark}) => downed.length === 3 || mark === 'strike' || mark === 'spare');
   }
+
+  // get score(): number {
+  //   return this.completed.reduce(((total, { score }) => total + score), 0);
+  // }
 
   constructor(frames: Frame[] = []) {
     frames.forEach(frame => this.#frames.add(frame));
@@ -45,6 +54,25 @@ export class Frames {
       while (this.#frames.size < 10) {
         this.#frames.add(new Frame(++i));
       }
+    }
+  }
+
+  total(): void {
+    let runningTotal = 0;
+    for (let i = 0; i < this.completed.length; i++) {
+      const frame = this.completed[i];
+      const nextFrame = this.completed[i + 1];
+      const double = this.completed[i + 2]
+      let pending = false;
+      runningTotal += frame.score;
+      if(nextFrame) {
+        if (frame.mark === 'spare') runningTotal += nextFrame.downed[0];
+        if (frame.mark === 'strike') {
+          if (nextFrame.downed.length > 1) runningTotal += (nextFrame.downed[0] + nextFrame.downed[1]);
+          if (nextFrame.mark === 'strike' && double) runningTotal += (nextFrame.downed[0] + double.downed[0]);
+        }
+      } else if (frame.mark === 'strike' || frame.mark === 'spare') pending = true;
+      if (!pending) frame.total = runningTotal;
     }
   }
 
@@ -63,9 +91,9 @@ export class Player {
     return new Player(name);
   }
 
-  get score(): number {
-    return this.#frames.score;
-  }
+  // get score(): number {
+  //   return this.#frames.score;
+  // }
 
   get name(): string {
     return this.#name;
@@ -78,5 +106,9 @@ export class Player {
   constructor(name: string, frames: Frames = new Frames()) {
     this.#frames = frames;
     this.#name = name;
+  }
+
+  total(): void {
+    this.#frames.total()
   }
 }
