@@ -212,10 +212,11 @@ export interface GameIdRollBody {
  * @enum {string}
  */
 export enum Mark {
-    Spare = <any> 'spare',
-    Strike = <any> 'strike',
-    Ten = <any> 'ten'
+    Spare = 'spare' as any,
+    Strike = 'strike' as any,
+    Ten = 'ten' as any
 }
+
 /**
  * 
  * @export
@@ -266,7 +267,7 @@ export const DefaultApiFetchParamCreator = function (configuration?: Configurati
             // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
             delete (localVarUrlObj as any).search;
             localVarRequestOptions.headers = Object.assign({}, localVarHeaderParameter, options.headers);
-            const needsSerialization = (<any>"GameIdRollBody" !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            const needsSerialization = ("GameIdRollBody" as any !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
             localVarRequestOptions.body =  needsSerialization ? JSON.stringify(body || {}) : (body || "");
 
             return {

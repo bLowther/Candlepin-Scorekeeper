@@ -38,7 +38,7 @@ export class Frames {
   }
 
   constructor(frames: Frame[] = []) {
-    frames.forEach(this.#frames.add);
+    frames.forEach(frame => this.#frames.add(frame));
 
     if (this.#frames.size < 10) {
       let i = Array.from(this.#frames.values()).pop()?.number || 0;

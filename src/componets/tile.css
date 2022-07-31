@@ -1,12 +1,17 @@
 .ten, .spare, .strike {
   border-style: solid;
   height: 5vw;
+  margin-top: 5%;
 }
 
 .spare {
-  background: linear-gradient(135deg, black 5%, white 0)
+  background: linear-gradient(135deg, black 10%, white 0)
 }
 
 .strike {
-  background: linear-gradient(135deg, black 5%, white 0, white 94%, black 1%)
+  background: linear-gradient(135deg, black 10%, white 0, white 90%, black 10%)
+}
+
+#active {
+  border-color: green;
 }

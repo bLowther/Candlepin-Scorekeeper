@@ -1,5 +1,6 @@
+import { TimerState } from "../App";
 
-const Timer: React.FC<{lane: number; timer: {secs:number; mins:number}}> = ({lane, timer}) => {
+const Timer: React.FC<{lane: number; timer: TimerState}> = ({lane, timer}) => {
   
   const mins = timer.mins;
   const secs = timer.secs;
