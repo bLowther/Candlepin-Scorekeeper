@@ -1,0 +1,21 @@
+.number, .activeNumber {
+  border-style: solid;
+  height: 5vw;
+  width: 4vw;
+  margin-top: 5px;
+  font-size: 4vh;
+  text-align: center;
+  padding: 0;
+}
+
+.activeNumber {
+  border-color: black;
+  background-color: green;
+  color: white;
+}
+
+.reset {
+  width: 4vw;
+  height: 2.5vw;
+  padding: 0;
+}

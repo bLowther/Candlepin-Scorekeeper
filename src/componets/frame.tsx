@@ -1,36 +1,16 @@
 import { Frame } from '../model';
 import Tile from './tile';
 
-// export class Frame {
-//   number: number = 0;
-//   downed: number = 0;
-//   complete: boolean = false;
-//   mark: Mark;
-//   active: boolean = false;
-//   ball?: number = 1;
-
-//   constructor(number: number, opts?: { downed: number, completed: boolean, mark: Mark }) {
-//     this.number = number;
-//     this.downed = opts?.downed || 0;
-//     this.complete = opts?.completed || false;
-//     this.mark = opts?.mark as Mark;
-//   }
-
-//   reset(): void {
-//     this.complete = false;
-//     this.downed = 0;
-//     this.mark = null;
-//   }
-// }
-
 const FrameCom: React.FC<{frame: Frame, isActivePlayer:boolean}> = ({frame, isActivePlayer}) => {
   const ball = frame.ball ? frame.ball : 0;
+  const firstRoll = frame.active && ball === 0 && isActivePlayer;
+  const stillRolling = frame.active && ball > 0 && isActivePlayer;
   return (
     <div>
       {frame.number === 1 ?
           <div className={"row"}>
-            <Tile score={0} mark={"ten"} active={frame.active && isActivePlayer} />
-            <Tile score={frame.total} mark={frame.mark} active={frame.active && isActivePlayer}/>
+            <Tile score={0} mark={"ten"} active={firstRoll} />
+            <Tile score={frame.total} mark={frame.mark} active={stillRolling}/>
           </div>
         :
         frame.mark === 'strike' || frame.mark === 'spare' ?
@@ -40,8 +20,8 @@ const FrameCom: React.FC<{frame: Frame, isActivePlayer:boolean}> = ({frame, isAc
           </div>
         :
       <div className={"row"}>
-          <Tile score={frame.score} mark={"ten"} active={frame.active && ball === 0 && isActivePlayer} />
-          <Tile score={frame.total} mark={frame.mark} active={frame.active && ball > 0 && isActivePlayer}/>
+          <Tile score={frame.score} mark={"ten"} active={firstRoll} />
+          <Tile score={frame.total} mark={frame.mark} active={stillRolling}/>
       </div>
       }
     </div>  

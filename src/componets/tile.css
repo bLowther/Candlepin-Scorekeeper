@@ -1,7 +1,8 @@
 .ten, .spare, .strike {
   border-style: solid;
   height: 5vw;
-  margin-top: 5%;
+  margin-top: 5px;
+  font-size: 4vh;
 }
 
 .spare {

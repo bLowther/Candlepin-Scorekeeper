@@ -2,32 +2,6 @@ import { Player } from '../model';
 import FrameCom from './frame';
 import './player.css';
 
-// export class Player {
-//   #frames: Frames;
-//   #name: string;
-
-//   static create(name: string): Player {
-//     return new Player(name);
-//   }
-
-//   get score(): number {
-//     return this.#frames.score;
-//   }
-
-//   get name(): string {
-//     return this.#name;
-//   }
-
-//   get frames(): Frame[] {
-//     return this.#frames.frames;
-//   }
-
-//   constructor(name: string, frames: Frames = new Frames()) {
-//     this.#frames = frames;
-//     this.#name = name;
-//   }
-// }
-
 interface PlayersProps {
   player: Player;
   activePlayer: string;

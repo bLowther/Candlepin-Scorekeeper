@@ -4,14 +4,15 @@ import { DefaultApi, Game } from './swagger-generated-client';
 import { Frame, Frames, Player, Mark } from './model';
 import Timer from './componets/timer';
 import PlayersCom from './componets/player';
-// import FramesCom from './componets/frames';
+import Reset from './componets/reset';
 
 export interface TimerState {secs:number; mins:number};
+export interface ActiveState {activePlayer:string, activeFrame:number};
 
 export interface AppState {
   id: string;
   players: Player[];
-  active: {activePlayer:string, activeFrame:number};
+  active: ActiveState;
   game: Game;
   timer: TimerState;
 }
@@ -23,15 +24,15 @@ export class App extends Component<{}, AppState> {
     super(props);
     this.state = {
       id: "0c39b11a-1123-44b5-ba74-72de7d5922fc",
-      players: [new Player('')],
-      active: {activePlayer:'', activeFrame: 1},
+      players: [new Player("New Player")],
+      active: {activePlayer:"New Player", activeFrame: 1},
       game: {
         id:"",
         frames: [{ 
           active: true, 
           complete: false, 
           number: 1, 
-          players:[{ player: "", mark: undefined, downed: [], ball: 0, active: false }] 
+          players:[{ player: "New Player", mark: undefined, downed: [], ball: 0, active: false }] 
         }],
         lane: 1,
       },
@@ -45,6 +46,19 @@ export class App extends Component<{}, AppState> {
     const timer = secs === 59 ? {secs: 0, mins: mins + 1} : {secs: secs + 1, mins: mins}
 
     this.setState({timer});
+  }
+
+  resetGame(e: React.MouseEvent<HTMLButtonElement>){
+    e.preventDefault();
+    const players: Player[] = []
+    const active: ActiveState = {activePlayer:'', activeFrame:1};
+    const timer: TimerState = {secs:0, mins:0}
+    
+    this.state.players.forEach(player=>{player.reset(); players.push(player)})
+    players[0].frames[0].active = true;
+    active.activePlayer = players[0].name;
+    
+    this.setState({players, active, timer})
   }
 
   componentDidMount() {
@@ -86,33 +100,31 @@ export class App extends Component<{}, AppState> {
     .catch(err => console.error(err));
   }
 
-  
-
   componentWillUnmount() {
     clearInterval(this.timerID);
   }
-  
-  
+
   render(): ReactElement {
     const { players, game, timer, active:{activePlayer, activeFrame} } = this.state;
+    const firstBall = players[0].frames[0].ball ? players[0].frames[0].ball : 0
+  
     return (
       <div>
         <Timer lane={game.lane} timer={timer}/>
-        <div>
-          <div className={"container text-center"}>
+        <div className={"container text-center"}>
+          <div className={"game"}>
             <div className={"row"}>
-            <div className={"col-1"}>
-              <div className={"row"}><button>Reset</button></div>
-              {players[0].frames.map(frame=>(
-               <div key={frame.number}>{frame.number}{activeFrame === frame.number ? '!' : ''}</div>
-              )) /**This needs to be pulled out into own componet and styled */}
-            </div>
+              <Reset
+                frames={players[0].frames}
+                activeFrame={activeFrame}
+                hasRolled={firstBall > 0}
+                resetGame={this.resetGame.bind(this)}
+              />
               {players.map(player=>(
                <PlayersCom player={player} activePlayer={activePlayer} key={player.name} />
               ))}
             </div>
           </div>
-          {/* <FramesCom frames={game.frames}/> */}
         </div>
       </div>
     );

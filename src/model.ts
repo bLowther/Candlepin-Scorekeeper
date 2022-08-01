@@ -18,6 +18,7 @@ export class Frame {
     this.downed = opts?.downed || [];
     this.complete = opts?.completed || false;
     this.mark = opts?.mark as Mark;
+    this.ball = opts?.downed.length || 0;
   }
 
   get score(): number {
@@ -28,6 +29,9 @@ export class Frame {
     this.complete = false;
     this.downed = [];
     this.mark = null;
+    this.total = 0;
+    this.ball = 0;
+    this.active = false;
   }
 }
 
@@ -110,5 +114,9 @@ export class Player {
 
   total(): void {
     this.#frames.total()
+  }
+
+  reset(): void {
+    this.#frames.reset()
   }
 }
