@@ -1,6 +1,12 @@
 import './tile.css';
 
-const Tile: React.FC<{score:number, mark:string | null, active:boolean}> = ({score, mark, active}) => {
+export interface TileProps {
+  score:number; 
+  mark:string | null;
+  active:boolean;
+}
+
+const Tile: React.FC<TileProps> = ({score, mark, active}) => {
   return (
     <div className={"col"} >
       <div className={mark ? mark.toString() : "ten"} id={active ? 'active' : ''}>

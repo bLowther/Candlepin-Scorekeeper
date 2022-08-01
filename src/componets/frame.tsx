@@ -1,7 +1,12 @@
 import { Frame } from '../model';
 import Tile from './tile';
 
-const FrameCom: React.FC<{frame: Frame, isActivePlayer:boolean}> = ({frame, isActivePlayer}) => {
+export interface FrameProps {
+  frame: Frame;
+  isActivePlayer:boolean;
+}
+
+const FrameCom: React.FC<FrameProps> = ({frame, isActivePlayer}) => {
   const ball = frame.ball ? frame.ball : 0;
   const firstRoll = frame.active && ball === 0 && isActivePlayer;
   const stillRolling = frame.active && ball > 0 && isActivePlayer;
