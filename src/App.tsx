@@ -5,6 +5,7 @@ import { Frame, Frames, Player, Mark } from './model';
 import Timer from './componets/timer';
 import PlayersCom from './componets/player';
 import Reset from './componets/reset';
+import ModalCom, { ModalProps } from './componets/modal';
 
 export interface TimerState {secs:number; mins:number};
 export interface ActiveState {activePlayer:string, activeFrame:number};
@@ -15,7 +16,7 @@ export interface AppState {
   timer: TimerState;
   active: ActiveState;
   players: Player[];
-  resestModal: boolean; 
+  modal: ModalProps 
 }
 
 export class App extends Component<{}, AppState> {
@@ -24,12 +25,21 @@ export class App extends Component<{}, AppState> {
   constructor(props:any) {
     super(props);
     this.state = {
-      id: "0c39b11a-1123-44b5-ba74-72de7d5922fc",
+      id: "",
       lane: 1,
       timer: {secs:0, mins:0},
-      active: {activePlayer:"New Player", activeFrame: 1},
-      players: [new Player("New Player")],
-      resestModal: false,
+      active: {activePlayer:"", activeFrame: 1},
+      players: [],
+      modal: {
+        open: false,
+        title: "Start Game" ,
+        names: [],
+        message: "Would you like to start a new game?",
+        cancel: "Add Player",
+        onCancel: this.addPlayer.bind(this) ,
+        confirm: "Start" ,
+        onConfirm: this.startgame.bind(this)
+      }
     };
   }
 
@@ -41,8 +51,31 @@ export class App extends Component<{}, AppState> {
     this.setState({timer});
   }
 
-  toggleResetModal(){
-    this.setState({resestModal: !this.state.resestModal});
+  toggleModal(){
+    let modal = {...this.state.modal};
+    modal.open = !modal.open;
+    this.setState({modal});
+  }
+
+  addPlayer(name:string){
+    let modal = {...this.state.modal};
+    modal.names.push(name);
+    this.setState({modal});
+  }
+
+  startgame(){
+    const players = this.state.modal.names.map(name=>new Player(name));
+    if(players.length > 0) {
+      const active = {activePlayer:players[0].name, activeFrame: 1}
+      this.setState({players, active});
+      this.toggleModal();
+    } else {
+      alert("You need to add a player")
+    }
+  }
+
+  gameOver(){
+    this.setState({id: ""});
   }
 
   resetGame(e: React.MouseEvent<HTMLButtonElement>){
@@ -56,7 +89,7 @@ export class App extends Component<{}, AppState> {
     active.activePlayer = players[0].name;
     
     this.setState({players, active, timer});
-    this.toggleResetModal();
+    this.toggleModal();
   }
 
   componentDidMount() {
@@ -64,37 +97,48 @@ export class App extends Component<{}, AppState> {
       () => this.counter(),
       1000
     );
-    this.#client.gamesGet(this.state.id)
-    .then(res => {
-      const body = res[0];
-      const lane = body.lane;
-      let active = {activePlayer: '', activeFrame: 1};
-      let players:any[] = [];
-      
-      body.frames[0].players.forEach(player => {
-        const name = player.player;
-        let framesArray: Frame[] = [];
-        body.frames.forEach(frame => {
-          if (frame.active) active.activeFrame = frame.number;
-          const thisPlayer = frame.players.find(player => player.player === name);
-          if(thisPlayer?.active) active.activePlayer = thisPlayer.player;
-          const downed = thisPlayer?.downed ? thisPlayer?.downed : [];
-          const completed = frame.complete;
-          const mark = (thisPlayer?.mark ? thisPlayer.mark.toString() : null) as Mark;
-          let newFrame = new Frame(frame.number,{ downed, completed, mark });
-          newFrame.ball = downed.length;
-          newFrame.active = frame.active;
-          framesArray.push(newFrame);
+
+    let players:Player[] = [];
+    let active = {activePlayer: '', activeFrame: 1};
+
+    if(this.state.id) {
+      this.#client.gamesGet(this.state.id)
+      .then(res => {
+        const body = res[0];
+        const lane = body.lane;
+        
+        body.frames[0].players.forEach(player => {
+          const name = player.player;
+          
+          let framesArray: Frame[] = [];
+          body.frames.forEach(frame => {
+            if (frame.active) active.activeFrame = frame.number;
+
+            const thisPlayer = frame.players.find(player => player.player === name);
+            if(thisPlayer?.active) active.activePlayer = thisPlayer.player;
+
+            const downed = thisPlayer?.downed ? thisPlayer?.downed : [];
+            const completed = frame.complete;
+            const mark = (thisPlayer?.mark ? thisPlayer.mark.toString() : null) as Mark;
+
+            let newFrame = new Frame(frame.number,{ downed, completed, mark });
+            newFrame.active = frame.active;
+
+            framesArray.push(newFrame);
+          });
+
+          const frames = new Frames(framesArray);
+          players.push(new Player(name, frames));
         });
 
-        const frames = new Frames(framesArray);
-        players.push(new Player(name, frames));
-      });
+        players.forEach(player=>player.total());
+        this.setState({lane, players, active});
+      })
+      .catch(err => console.error(err));  
+    } else {
+      this.toggleModal();
+    }
 
-      players.forEach(player=>player.total());
-      this.setState({lane, players, active});
-    })
-    .catch(err => console.error(err));
   }
 
   componentWillUnmount() {
@@ -102,33 +146,61 @@ export class App extends Component<{}, AppState> {
   }
 
   render(): ReactElement {
-    const { players, lane, timer, active:{activePlayer, activeFrame}, resestModal } = this.state;
-    const firstBall = players[0].frames[0].ball ? players[0].frames[0].ball : 0;
+    const { id, players, lane, timer, active:{activePlayer, activeFrame}, modal: {open, names} } = this.state;
+    const gameIsOver = players.length > 0 ? players[players.length - 1].frames[9].complete : false;
+
+    const resetModal = {
+      open : open,
+      title: "Restart?",
+      message: "Are you sure that you want to restart the game?",
+      names: names,
+      cancel: "Cancel",
+      onCancel: this.toggleModal.bind(this), 
+      confirm: "Restart", 
+      onConfirm: this.gameOver.bind(this)
+    }
+
+    const gameOverModal = {
+      open: open,
+      title: "Game Complete!" ,
+      names: names,
+      message: "Would you like to start another game?",
+      cancel: "Quit",
+      onCancel: this.gameOver.bind(this) ,
+      confirm: "Start" ,
+      onConfirm: this.resetGame.bind(this)
+    }
+
+    const newGameModal = {
+      open: open,
+      title: "New Game" ,
+      names: names,
+      message: "Would you like to start a new game?",
+      cancel: "Add Player",
+      onCancel: this.addPlayer.bind(this) ,
+      confirm: "Start" ,
+      onConfirm: this.startgame.bind(this)
+    }
   
     return (
       <div>
+        {!id ? <ModalCom {...newGameModal}/> : 
+          gameIsOver ? <ModalCom {...gameOverModal}/> :
+          <ModalCom {...resetModal}/> }
         <Timer lane={lane} timer={timer}/>
         <div className={"container text-center"}>
           <div className={"game"}>
             <div className={"row"}>
-              <Reset
-                frames={players[0].frames}
-                activeFrame={activeFrame}
-                hasRolled={firstBall > 0}
-                open={resestModal}
-                toggleResetModal={this.toggleResetModal.bind(this)}
-                reset={this.resetGame.bind(this)}
-              />
+              <Reset activeFrame={activeFrame} firstBall={false} resetModalToggle={resetModal.onCancel}/>
               {players.map(player=>(
                <PlayersCom player={player} activePlayer={activePlayer} key={player.name} />
               ))}
             </div>
           </div>
         </div>
-        {/**EndGame Modal*/}
       </div>
     );
   }
-}
+};
 
 export default App;

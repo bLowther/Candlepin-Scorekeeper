@@ -6,16 +6,19 @@
   font-size: 4vh;
   text-align: center;
   padding: 0;
+  box-shadow: 3px 3px;
 }
 
 .activeNumber {
   border-color: black;
   background-color: green;
   color: white;
+  box-shadow: inset;
 }
 
 .reset {
   width: 4vw;
   height: 2.5vw;
   padding: 0;
+  box-shadow: 3px 3px;
 }
