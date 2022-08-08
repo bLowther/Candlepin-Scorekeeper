@@ -14,7 +14,7 @@ export interface ModalProps {
   cancel: string;
   onCancel: (name?:any)=>void;
   confirm: string;
-  onConfirm: (e: any)=>void;
+  onConfirm: ()=>void;
 }
 
 const ModalCom: React.FC<ModalProps> = ({open, title, names, message, cancel, onCancel, confirm, onConfirm}) => {
@@ -39,7 +39,7 @@ const ModalCom: React.FC<ModalProps> = ({open, title, names, message, cancel, on
     </Modal.Body>
     <Modal.Footer style={{justifyContent:"space-between"}}>
       {title === "New Game" ? 
-        <InputGroup>
+        <InputGroup size={"sm"}>
           <Button variant="outline-secondary" id="addPlayers" type="submit" onClick={()=>{onCancel(value); setValue('')}}>
             {cancel}
           </Button>
@@ -50,7 +50,8 @@ const ModalCom: React.FC<ModalProps> = ({open, title, names, message, cancel, on
         </InputGroup>
       : <Button variant="secondary" onClick={onCancel} >
         {cancel}
-      </Button>}
+      </Button>
+      }
       <Button variant="success" onClick={onConfirm}>
         {confirm}
       </Button>

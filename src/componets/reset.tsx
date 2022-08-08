@@ -10,7 +10,7 @@ export interface ResetProps {
 
 const Reset: React.FC<ResetProps> = ({ activeFrame, firstBall, resetModalToggle }) => {
 
-  const frames = [1,2,3,4,5,6,7,8,9,10]
+  const frames = [1,2,3,4,5,6,7,8,9,10];
   return (
     <div className={"col-1"}>
       <div className={"row"} style={{justifyContent: "right"}}>
