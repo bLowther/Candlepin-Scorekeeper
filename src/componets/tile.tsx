@@ -9,7 +9,7 @@ export interface TileProps {
 const Tile: React.FC<TileProps> = ({score, mark, active}) => {
   return (
     <div className={"col"} >
-      <div className={mark ? mark.toString() : "ten"} id={active ? 'active' : ''}>
+      <div className={mark ? mark.toString() : "ten"} style={active ? {borderColor: "green"} : {}}  data-testid="tile">
         {score > 0 ? score : ''}
       </div>
     </div>

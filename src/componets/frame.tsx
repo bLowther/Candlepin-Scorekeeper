@@ -13,21 +13,21 @@ const FrameCom: React.FC<FrameProps> = ({frame, isActivePlayer}) => {
   return (
     <div>
       {frame.number === 1 ?
-          <div className={"row"}>
+          <div className={"row"} data-testid="frame">
             <Tile score={0} mark={"ten"} active={firstRoll} />
             <Tile score={frame.total} mark={frame.mark} active={stillRolling}/>
           </div>
         :
         frame.mark === 'strike' || frame.mark === 'spare' ?
-          <div className={"row"}>
+          <div className={"row"} data-testid="frame">
             <Tile score={0} mark={frame.mark} active={false} />
             <Tile score={frame.total} mark={"ten"} active={false}/>
           </div>
         :
-      <div className={"row"}>
-          <Tile score={frame.score} mark={"ten"} active={firstRoll} />
-          <Tile score={frame.total} mark={frame.mark} active={stillRolling}/>
-      </div>
+          <div className={"row"} data-testid="frame">
+              <Tile score={frame.score} mark={"ten"} active={firstRoll} />
+              <Tile score={frame.total} mark={frame.mark} active={stillRolling}/>
+          </div>
       }
     </div>  
   );

@@ -4,24 +4,24 @@ const iconPath = "M14.854 4.854a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.29
 
 export interface ResetProps {
   activeFrame: number;
-  firstBall: boolean;
+  rolledFirstBall: boolean;
   resetModalToggle: ()=>void;
 };
 
-const Reset: React.FC<ResetProps> = ({ activeFrame, firstBall, resetModalToggle }) => {
+const Reset: React.FC<ResetProps> = ({ activeFrame, rolledFirstBall, resetModalToggle }) => {
 
   const frames = [1,2,3,4,5,6,7,8,9,10];
   return (
     <div className={"col-1"}>
       <div className={"row"} style={{justifyContent: "right"}}>
-        <button className={"reset"} onClick={resetModalToggle} style={firstBall ? {} : {visibility: "hidden"}}>
+        <button className={"reset"} onClick={resetModalToggle} style={rolledFirstBall ? {} : {visibility: "hidden"}} data-testid="ResetButton">
           <svg xmlns={"http://www.w3.org/2000/svg"} width={"24"} height={"16"} className={"bi bi-arrow-90deg-right"} viewBox={"0 0 16 16"}>
             <path d={iconPath}/>
           </svg>
         </button>
       </div>
       {frames.map(frame=>(
-        <div className={"row"} style={{justifyContent: "right"}} key={frame}>
+        <div className={"row"} style={{justifyContent: "right"}} key={frame} aria-label="Frame">
          <div key={frame} className={activeFrame === frame ? "activeNumber" : "number" } >
            {frame}
          </div>

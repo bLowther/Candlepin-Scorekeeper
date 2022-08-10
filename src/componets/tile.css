@@ -12,7 +12,3 @@
 .strike {
   background: linear-gradient(135deg, black 10%, white 0, white 90%, black 10%)
 }
-
-#active {
-  border-color: green;
-}
