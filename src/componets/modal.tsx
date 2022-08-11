@@ -26,14 +26,14 @@ const ModalCom: React.FC<ModalProps> = ({open, title, names, message, cancel, on
         <ListGroup>
           <ListGroup.Item>Players to join:</ListGroup.Item>
           {names.map(player=>(
-            <ListGroup.Item action onClick={onCancel} key={player + 'Modal'}>
+            <ListGroup.Item action onClick={()=>onCancel(player, true)} key={player + 'Modal'}>
               {player}
             </ListGroup.Item>))}
         </ListGroup>
         : <></>}
     </Modal.Body>
-    <Modal.Footer style={{justifyContent:"space-between"}}>
-      {title === "New Game" ? 
+      {title === "New Game" ?
+      <Modal.Footer style={{justifyContent:"center"}}> 
         <InputGroup size={"sm"}>
           <Button variant="outline-secondary" id="addPlayers" type="submit" onClick={()=>{onCancel(value); setValue('')}}>
             {cancel}
@@ -43,14 +43,24 @@ const ModalCom: React.FC<ModalProps> = ({open, title, names, message, cancel, on
             onChange={(e) => setValue(e.target.value)}
           />
         </InputGroup>
-      : <Button variant="secondary" onClick={onCancel} >
-        {cancel}
-      </Button>
-      }
-      <Button variant="success" onClick={onConfirm}>
-        {confirm}
-      </Button>
-    </Modal.Footer>
+        {names.length ?
+        <Button variant="success" onClick={()=>onConfirm(names)}>
+          {confirm}
+        </Button>
+        :
+        <></>
+        }
+      </Modal.Footer>
+      :
+      <Modal.Footer style={{justifyContent:"space-between"}}> 
+        <Button variant="secondary" onClick={onCancel} >
+          {cancel}
+        </Button>
+        <Button variant="success" onClick={onConfirm}>
+          {confirm}
+        </Button>
+      </Modal.Footer>
+      } 
   </Modal>
   )
 }

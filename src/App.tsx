@@ -12,9 +12,9 @@ export interface ModalState {
   title: string;
   message: string;
   cancel: string;
-  onCancel: (name?:any)=>void;
+  onCancel: (name?:any, remove?:boolean)=>void;
   confirm: string;
-  onConfirm: ()=>void;
+  onConfirm: (names?:any)=>void;
 }
 
 function App() {
@@ -35,51 +35,35 @@ function App() {
     onConfirm: ()=>{},
   });
 
-  // const counter = () => {
-  //   const secs = timer.secs;
-  //   const mins = timer.mins;
-  //   const newTimer = secs === 59 ? {secs: 0, mins: mins + 1} : {secs: secs + 1, mins: mins};
-
-  //   setTimer({...newTimer});
-  //   updateGameState();
-  // }
-
   const toggleModal = () => {
     setOpenModal(prevOpenModal => !prevOpenModal);
   }
 
-  const addPlayer = (name:string) => {
-    if(name) {
-      setNames([...names, name])
-    }
+  const addRemovePlayer = (name:string, remove?:boolean) => {
+    if(name) setNames(prevNames => [...prevNames, name])
+    if(remove) setNames(prevNames => prevNames.filter(string=>string !== name))
   }
 
-  const startgame = () => {   
-    if(names.length > 0) {
-      const newPlayers = names.map(name=>new Player(name));
-      newPlayers[0].frames[0].active = true;
+  const startgame = (names:string[]) => {
+    let newPlayers = names.map(name=>new Player(name));
+    newPlayers.forEach(player => player.frames[0].active = true);
 
-      setNames([]);
-      setActive({activePlayer:newPlayers[0].name, activeFrame: 1});
-      setPlayers(newPlayers);
-      setCounter(0);
-      toggleModal();
-    } else {
-      alert("You need to add a player");
-    }
+    setNames([]);
+    setActive({activePlayer:newPlayers[0].name, activeFrame: 1});
+    setPlayers(newPlayers);
+    setCounter(0);
+    toggleModal();
   }
 
   const endGame = () => {
-    // if(this.timerID)clearInterval(this.timerID);
     const modal = {
       title: "New Game",
       message: "Would you like to start a new game?",
       cancel: "Add Player",
-      onCancel: addPlayer,
+      onCancel: addRemovePlayer,
       confirm: "Start",
       onConfirm: startgame
     };
-    setId("");
     setModal(modal);
     setOpenModal(true);
   }
@@ -93,6 +77,7 @@ function App() {
       confirm: "Start",
       onConfirm: resetGame
     };
+    setId("");
     setModal(modal);
     setOpenModal(true);
   }  
@@ -171,7 +156,6 @@ function App() {
   useEffect(() => {
     const timerID = setInterval(() => {
         setCounter(prevCount => prevCount + 1);
-        updateGameState();
       },
       1000
     );
