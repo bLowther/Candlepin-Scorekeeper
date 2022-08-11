@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { ModalState } from '../App';
 
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -6,15 +7,9 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 
-export interface ModalProps {
-  open: boolean;
-  title: string;
-  names: string[];
-  message: string;
-  cancel: string;
-  onCancel: (name?:any)=>void;
-  confirm: string;
-  onConfirm: ()=>void;
+export interface ModalProps extends ModalState {
+  open: boolean,
+  names: string[]
 }
 
 const ModalCom: React.FC<ModalProps> = ({open, title, names, message, cancel, onCancel, confirm, onConfirm}) => {

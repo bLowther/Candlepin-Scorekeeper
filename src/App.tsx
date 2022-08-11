@@ -1,149 +1,134 @@
-import { Component, ReactElement } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import './App.css';
 import { DefaultApi } from './swagger-generated-client'; 
 import { Frame, Frames, Player, Mark } from './model';
 import Timer from './componets/timer';
 import PlayersCom from './componets/player';
 import Reset from './componets/reset';
-import ModalCom, { ModalProps } from './componets/modal';
+import ModalCom from './componets/modal';
 
-export interface TimerState {secs:number; mins:number};
 export interface ActiveState {activePlayer:string, activeFrame:number};
-
-export interface AppState {
-  id: string;
-  lane: number;
-  timer: TimerState;
-  active: ActiveState;
-  players: Player[];
-  modal: ModalProps 
+export interface ModalState {
+  title: string;
+  message: string;
+  cancel: string;
+  onCancel: (name?:any)=>void;
+  confirm: string;
+  onConfirm: ()=>void;
 }
 
-export class App extends Component<{}, AppState> {
-  #client: DefaultApi = new DefaultApi({}, 'http://localhost:3123');
-  private timerID: any;
-  constructor(props:any) {
-    super(props);
-    this.state = {
-      id: "0c39b11a-1123-44b5-ba74-72de7d5922fc",
-      lane: 1,
-      timer: {secs:0, mins:0},
-      active: {activePlayer:"", activeFrame: 1},
-      players: [],
-      modal: {
-        open: false,
-        title: "" ,
-        names: [],
-        message: "",
-        cancel: "",
-        onCancel: ()=>{} ,
-        confirm: "" ,
-        onConfirm: ()=>{},
-      }
-    };
+function App() {
+  const client: DefaultApi = new DefaultApi({}, 'http://localhost:3123');
+  const [id, setId] = useState<string>("0c39b11a-1123-44b5-ba74-72de7d5922fc");
+  const [lane, setLane] = useState<number>(1);
+  const [counter, setCounter] = useState<number>(0);
+  const [active, setActive] = useState<ActiveState>({activePlayer:"", activeFrame: 1});
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [names, setNames] = useState<string[]>([])
+  const [modal, setModal] = useState<ModalState>({
+    title: "" ,
+    message: "",
+    cancel: "",
+    onCancel: ()=>{} ,
+    confirm: "" ,
+    onConfirm: ()=>{},
+  });
+
+  // const counter = () => {
+  //   const secs = timer.secs;
+  //   const mins = timer.mins;
+  //   const newTimer = secs === 59 ? {secs: 0, mins: mins + 1} : {secs: secs + 1, mins: mins};
+
+  //   setTimer({...newTimer});
+  //   updateGameState();
+  // }
+
+  const toggleModal = () => {
+    setOpenModal(prevOpenModal => !prevOpenModal);
   }
 
-  counter() {
-    const secs = this.state.timer.secs;
-    const mins = this.state.timer.mins;
-    const timer = secs === 59 ? {secs: 0, mins: mins + 1} : {secs: secs + 1, mins: mins};
-
-    this.setState({timer});
-    this.updateGameState();
-  }
-
-  toggleModal(){
-    let modal = {...this.state.modal};
-    modal.open = !modal.open;
-    this.setState({modal});
-  }
-
-  addPlayer(name:string){
+  const addPlayer = (name:string) => {
     if(name) {
-      let modal = {...this.state.modal};
-      modal.names.push(name);
-      this.setState({modal});  
+      setNames([...names, name])
     }
   }
 
-  startgame(){
-    const players = this.state.modal.names.map(name=>new Player(name));
-    if(players.length > 0) {
-      this.timerID = setInterval(
-        () => this.counter(),
-        1000
-      );
-      const timer: TimerState = {secs:0, mins:0};
-      const active = {activePlayer:players[0].name, activeFrame: 1};
-      players[0].frames[0].active = true;
-      this.setState({players, active, timer});
-      this.toggleModal();
+  const startgame = () => {   
+    if(names.length > 0) {
+      const newPlayers = names.map(name=>new Player(name));
+      newPlayers[0].frames[0].active = true;
+
+      setNames([]);
+      setActive({activePlayer:newPlayers[0].name, activeFrame: 1});
+      setPlayers(newPlayers);
+      setCounter(0);
+      toggleModal();
     } else {
-      alert("You need to add a player")
+      alert("You need to add a player");
     }
   }
 
-  endGame(){
-    if(this.timerID)clearInterval(this.timerID);
-    const modal: ModalProps = {
-      open: true,
-      title: "New Game" ,
-      names: [],
+  const endGame = () => {
+    // if(this.timerID)clearInterval(this.timerID);
+    const modal = {
+      title: "New Game",
       message: "Would you like to start a new game?",
       cancel: "Add Player",
-      onCancel: this.addPlayer.bind(this) ,
-      confirm: "Start" ,
-      onConfirm: this.startgame.bind(this)
-    }
-    this.setState({id: "", modal});
+      onCancel: addPlayer,
+      confirm: "Start",
+      onConfirm: startgame
+    };
+    setId("");
+    setModal(modal);
+    setOpenModal(true);
   }
 
-  finishGame() {
-    const modal: ModalProps = {
-      open: true,
-      title: "Game Complete!" ,
-      names: [],
+  const finishGame = () => {
+    const modal = {
+      title: "Game Complete!",
       message: "Would you like to start another game?",
       cancel: "Quit",
-      onCancel: this.endGame.bind(this) ,
-      confirm: "Start" ,
-      onConfirm: this.resetGame.bind(this)
-    }
-    this.setState({ modal });
+      onCancel: endGame,
+      confirm: "Start",
+      onConfirm: resetGame
+    };
+    setModal(modal);
+    setOpenModal(true);
   }  
 
-  setResetModal() {
-    const modal: ModalProps = {
-      open: false,
+  const setResetModal = () => {
+    const modal = {
       title: "Restart?",
-      names: [],
       message: "Are you sure that you want to restart the game?",
       cancel: "Cancel",
-      onCancel: this.toggleModal.bind(this), 
+      onCancel: toggleModal, 
       confirm: "Restart", 
-      onConfirm: this.endGame.bind(this)
-    }
-    this.setState({ modal });
+      onConfirm: endGame
+    };
+    setModal(modal);
+    setOpenModal(false);
   }
 
-  resetGame(){
-    const players: Player[] = [];
+  const resetGame = () => {
+    const newPlayers: Player[] = [];
     const active: ActiveState = {activePlayer: '', activeFrame: 1};
-    const timer: TimerState = {secs:0, mins:0};
     
-    this.state.players.forEach(player=>{player.reset(); players.push(player)});
-    players[0].frames[0].active = true;
+    players.forEach(player=>{player.reset(); newPlayers.push(player)});
+    newPlayers[0].frames[0].active = true;
     active.activePlayer = players[0].name;
 
-    this.setResetModal();
-    this.setState({players, active, timer});
+    setResetModal();
+    setPlayers(players);
+    setActive(active);
+    setCounter(0);
   }
 
-  updateGameState() { 
+  const updateGameState = () => { 
     let players:Player[] = [];
     let active = {activePlayer: '', activeFrame: 1};
 
-    this.#client.gamesGet(this.state.id)
+    client.gamesGet(id) // async await
     .then(res => {
       const body = res[0];
       const lane = body.lane;
@@ -158,7 +143,7 @@ export class App extends Component<{}, AppState> {
           const thisPlayer = frame.players.find(player => player.player === name);
           if(thisPlayer?.active) active.activePlayer = thisPlayer.player;
 
-          const downed = thisPlayer?.downed ? thisPlayer?.downed : [];
+          const downed = thisPlayer?.downed ? thisPlayer.downed : [];
           const completed = frame.complete;
           const mark = (thisPlayer?.mark ? thisPlayer.mark.toString() : null) as Mark;
 
@@ -173,54 +158,52 @@ export class App extends Component<{}, AppState> {
       });
 
       players.forEach(player=>player.total());
-      this.setResetModal();
-      this.setState({lane, players, active});
+      setResetModal();
+      setPlayers(players);
+      setActive(active);
+      setLane(lane);
     })
     .catch(err => {
-      clearInterval(this.timerID);
       console.error(err);
     }); 
   }
 
-  componentDidMount() {
-    if(this.state.id) {
-      this.timerID = setInterval(
-        () => this.counter(),
-        1000
-      );
+  useEffect(() => {
+    const timerID = setInterval(() => {
+        setCounter(prevCount => prevCount + 1);
+        updateGameState();
+      },
+      1000
+    );
+    return () => clearInterval(timerID);
+  },[setCounter]);
 
-      this.updateGameState();
+  useLayoutEffect(()=>{
+    if(id) {
+      updateGameState();
     } else {
-      this.endGame();
-    }
+      endGame();
+    }    
+  },[id]);
 
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timerID);
-  }
-
-  render(): ReactElement {
-    const { players, lane, timer, active:{activePlayer, activeFrame}, modal, } = this.state;
-    const firstBall = players.length > 0 ? players[0].frames[0] : new Frame(0);
+  const firstBall = players.length > 0 ? players[0].frames[0] : new Frame(0);
   
-    return (
-      <div>
-        <ModalCom {...modal}/>
-        <Timer lane={lane} timer={timer}/>
-        <div className={"container text-center"}>
-          <div className={"game"}>
-            <div className={"row"}>
-              <Reset activeFrame={activeFrame} firstBall={firstBall.complete} resetModalToggle={this.toggleModal.bind(this)}/>
-              {players.map(player=>(
-               <PlayersCom player={player} activePlayer={activePlayer} key={player.name} />
-              ))}
-            </div>
+  return (
+    <div>
+      <ModalCom {...modal} open={openModal} names={names}/>
+      <Timer lane={lane} timer={counter}/>
+      <div className={"container text-center"}>
+        <div className={"game"}>
+          <div className={"row"}>
+            <Reset activeFrame={active.activeFrame} rolledFirstBall={firstBall.complete} resetModalToggle={toggleModal}/>
+            {players.map(player=>(
+              <PlayersCom player={player} activePlayer={active.activePlayer} key={player.name} />
+            ))}
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 };
 
 export default App;

@@ -18,7 +18,6 @@ test('Tile that has "spare" mark has propper css', () => {
   render(<Tile { ...testProps } />);
   const tile = screen.queryByTestId('tile');
   expect(tile).toHaveClass('spare');
-  expect(tile).toHaveStyle('background: linear-gradient(135deg, black 10%, white 0)');
 });
 
 test('Tile that has "strike" mark has propper css', () => {
@@ -26,7 +25,6 @@ test('Tile that has "strike" mark has propper css', () => {
   render(<Tile { ...testProps } />);
   const tile = screen.queryByTestId('tile');
   expect(tile).toHaveClass('strike');
-  expect(tile).toHaveStyle('background: linear-gradient(135deg, black 10%, white 0, white 90%, black 10%)');
 });
 
 test('Tile displays the proper score', () => {

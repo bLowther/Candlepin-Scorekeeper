@@ -46,10 +46,6 @@ export class Frames {
     return this.frames.filter(({ downed, mark}) => downed.length === 3 || mark === 'strike' || mark === 'spare');
   }
 
-  // get score(): number {
-  //   return this.completed.reduce(((total, { score }) => total + score), 0);
-  // }
-
   constructor(frames: Frame[] = []) {
     frames.forEach(frame => this.#frames.add(frame));
 
@@ -94,10 +90,6 @@ export class Player {
   static create(name: string): Player {
     return new Player(name);
   }
-
-  // get score(): number {
-  //   return this.#frames.score;
-  // }
 
   get name(): string {
     return this.#name;
