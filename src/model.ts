@@ -19,6 +19,7 @@ export class Frame {
     this.complete = opts?.completed || false;
     this.mark = opts?.mark as Mark;
     this.ball = opts?.downed.length || 0;
+    this.active = number === 1
   }
 
   get score(): number {
@@ -31,7 +32,7 @@ export class Frame {
     this.mark = null;
     this.total = 0;
     this.ball = 0;
-    this.active = false;
+    this.active = this.number === 1
   }
 }
 

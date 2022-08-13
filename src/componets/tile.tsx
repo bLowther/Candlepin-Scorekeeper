@@ -1,6 +1,6 @@
 import './tile.css';
 
-export interface TileProps {
+interface TileProps {
   score:number; 
   mark:string | null;
   active:boolean;

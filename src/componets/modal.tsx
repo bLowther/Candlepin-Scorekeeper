@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import { Dispatch, SetStateAction, FC } from 'react';
 import { ModalState } from '../App';
 
 import Button from 'react-bootstrap/Button';
@@ -7,13 +7,14 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 
-export interface ModalProps extends ModalState {
+interface ModalProps extends ModalState {
   open: boolean,
-  names: string[]
+  names: string[],
+  value: string,
+  setValue: Dispatch<SetStateAction<string>>
 }
 
-const ModalCom: React.FC<ModalProps> = ({open, title, names, message, cancel, onCancel, confirm, onConfirm}) => {
-  const [value, setValue] = useState('');
+const ModalCom: FC<ModalProps> = ({open, title, names, message, cancel, onCancel, confirm, onConfirm, value, setValue}) => {
 
   return (
     <Modal show={open} onHide={onCancel}>
@@ -30,9 +31,11 @@ const ModalCom: React.FC<ModalProps> = ({open, title, names, message, cancel, on
               {player}
             </ListGroup.Item>))}
         </ListGroup>
-        : <></>}
+      : 
+        <></>
+      }
     </Modal.Body>
-      {title === "New Game" ?
+    {title === "New Game" ?
       <Modal.Footer style={{justifyContent:"center"}}> 
         <InputGroup size={"sm"}>
           <Button variant="outline-secondary" id="addPlayers" type="submit" onClick={()=>{onCancel(value); setValue('')}}>
@@ -44,14 +47,14 @@ const ModalCom: React.FC<ModalProps> = ({open, title, names, message, cancel, on
           />
         </InputGroup>
         {names.length ?
-        <Button variant="success" onClick={()=>onConfirm(names)}>
-          {confirm}
-        </Button>
+          <Button variant="success" onClick={()=>onConfirm(names)}>
+            {confirm}
+          </Button>
         :
-        <></>
+          <></>
         }
       </Modal.Footer>
-      :
+    :
       <Modal.Footer style={{justifyContent:"space-between"}}> 
         <Button variant="secondary" onClick={onCancel} >
           {cancel}
@@ -60,7 +63,7 @@ const ModalCom: React.FC<ModalProps> = ({open, title, names, message, cancel, on
           {confirm}
         </Button>
       </Modal.Footer>
-      } 
+    } 
   </Modal>
   )
 }

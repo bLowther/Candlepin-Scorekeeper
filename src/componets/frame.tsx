@@ -1,7 +1,7 @@
 import { Frame } from '../model';
 import Tile from './tile';
 
-export interface FrameProps {
+interface FrameProps {
   frame: Frame;
   isActivePlayer:boolean;
 }
