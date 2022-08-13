@@ -126,13 +126,12 @@ function App() {
         players.push(new Player(name, frames));
       });
       players.forEach(player=>player.total());
-const winner = players.map((player => player.name + " : " + player.frames[0].total)).sort((a, b) => Number(b.split(":")[1]) - Number(a.split(":")[1]));
-// console.log(winner)
+
       setPlayers(players);
       setActive(active);
       setLane(lane);
       if(body.completed) {
-        
+        const winner = players.map((player => player.name + " : " + player.frames[9].total)).sort((a, b) => Number(b.split(":")[1]) - Number(a.split(":")[1]));
         setNames(winner)
         switchModal(completedGameModal);
       };

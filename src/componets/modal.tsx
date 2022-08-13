@@ -31,6 +31,14 @@ const ModalCom: FC<ModalProps> = ({open, title, names, message, cancel, onCancel
               {player}
             </ListGroup.Item>))}
         </ListGroup>
+      :title === "Game Complete!" ?  
+        <ListGroup>
+          <ListGroup.Item>Final Scores:</ListGroup.Item>
+          {names.map((player, i)=>(
+            <ListGroup.Item key={player + 'Modal'}>
+              {`${i === 0 ? 'Winner! ' : i === 1 ? '2nd ' : i=== 2 ? '3rd ' : i+1 + 'th '} ${player}`}
+            </ListGroup.Item>))}
+        </ListGroup>
       : 
         <></>
       }
