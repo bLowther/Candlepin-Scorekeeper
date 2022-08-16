@@ -1,5 +1,5 @@
 import FrameCom from '../componets/frame';
-import { Frame } from '../model';
+import { Frame } from '../core/player';
 import {render, screen} from '@testing-library/react'
 
 let testFrame = {

@@ -1,9 +1,5 @@
 export type Mark = 'spare' | 'strike' | null;
 
-export interface Listeners {
-  [event: string]: Set<Function>;
-}
-
 export class Frame {
   number: number = 0;
   total: number = 0;
@@ -72,7 +68,7 @@ export class Frames {
           if (nextFrame.downed.length > 1) runningTotal += (nextFrame.downed[0] + nextFrame.downed[1]);
           if (nextFrame.mark === 'strike' && double) runningTotal += (nextFrame.downed[0] + double.downed[0]);
         }
-      } else if (frame.mark === 'strike' || frame.mark === 'spare') pending = true;
+      } else if ((frame.mark === 'strike' && frame.number < 9) || (frame.mark === 'spare' && frame.number < 10)) pending = true;
       if (!pending) frame.total = runningTotal;
     }
   }

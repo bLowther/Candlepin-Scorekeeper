@@ -1,4 +1,4 @@
-import { Player } from '../model';
+import { Player } from '../core/player';
 import FrameCom from './frame';
 import './player.css';
 

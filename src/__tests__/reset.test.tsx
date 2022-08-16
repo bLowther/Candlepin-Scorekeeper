@@ -1,10 +1,12 @@
 import Reset from '../componets/reset';
 import {render, screen} from '@testing-library/react'
+import { Player } from '../core/player';
 
 let testProps = {
-  activeFrame: 4,
-  rolledFirstBall: false,
-  resetModalToggle: ()=>{}
+  completed:false,
+  players:[new Player('test')],
+  initializeGame:(players:Player[])=>{}, 
+  stopTimer:()=>{}
 };
 
 test('Reset should have 10 frames', () => {

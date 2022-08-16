@@ -1,10 +1,7 @@
 import Timer from '../componets/timer';
 import {render, screen} from '@testing-library/react'
 
-const testProps = {
-    lane: 5,
-    timer: {secs:0, mins:0}
-};
+const testProps = {lane: 5, active: true, reset: false};
 
 test('Timer should have a lane number', () => {
     render(<Timer  { ...testProps }/>);

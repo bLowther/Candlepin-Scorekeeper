@@ -1,4 +1,4 @@
-import { Frame } from '../model';
+import { Frame } from '../core/player';
 import Tile from './tile';
 
 interface FrameProps {
