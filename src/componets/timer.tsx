@@ -28,7 +28,7 @@ const Timer: FC<{lane: number; active: boolean, reset: boolean}> = ({lane, activ
     <div className={"container"}>
       <div className={"row"}>
         <div className={"col"}>Lane: {lane}</div>
-        <div className={"col"} style={{textAlign: "right"}}>Elapsed: {format(counter)}</div> 
+        <div className={"col"} style={{textAlign: "right"}} data-testid="timer">Elapsed: {format(counter)}</div> 
       </div>
 
     </div>
