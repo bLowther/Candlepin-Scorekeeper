@@ -1,7 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import './App.css';
 import { DefaultApi } from './swagger-generated-client'; 
-import { Frame, Frames, Player, Mark } from './core/player';
+import { Frame, Frames, Player } from './core/player';
 import Timer from './componets/timer';
 import PlayersCom from './componets/player';
 import Reset from './componets/reset';
@@ -25,47 +25,43 @@ function App() {
     setActiveTimer(true);
   };  
 
-  const updateGameState = useCallback(() => { 
+  const updateGameState = useCallback(async () => { 
     const client:DefaultApi = new DefaultApi({}, 'http://localhost:3123');
     let players:Player[] = [];
 
-    if(id && id !== "newId")client.gamesGet(id)
-    .then(res => {
+    if(id && id !== "newId") {
+      const res = await client.gamesGet(id);
       const body = res[0];
       const currentLane = body.lane;
-      
+        
       body.frames[0].players.forEach(player => {
         const name = player.player;
         let framesArray: Frame[] = [];
 
-        body.frames.forEach(frame => {
-
-          const thisPlayer = frame.players.find(player => player.player === name);
-          if(thisPlayer?.active) setActivePlayer(thisPlayer.player);
-
-          const downed = thisPlayer?.downed || [];
-          const completed = frame.complete;
-          const mark = (thisPlayer?.mark?.toString() || null) as Mark;
-
-          let newFrame = new Frame(frame.number,{ downed, completed, mark });
+        body.frames.forEach((frame: { players: any[]; complete: any; number: number; active: boolean; }) => {
+          const thisPlayer = frame.players.find(({player}) => player === name);
+          if(thisPlayer.active) setActivePlayer(thisPlayer.player);
+          const opts = {
+            downed : thisPlayer.downed || [],
+            completed : frame.complete,
+            mark : thisPlayer.mark?.toString() || null
+          };
+          let newFrame = new Frame(frame.number,opts);
           newFrame.active = frame.active;
-
           framesArray.push(newFrame);
         });
 
         const frames = new Frames(framesArray);
         players.push(new Player(name, frames));
       });
-      players.forEach(player=>player.total());
 
+      players.forEach(player=>player.total());
+      
       setPlayers(players);
       if(lane !== currentLane)setLane(currentLane);
       if(gameReset) setGameReset(false);
       if(body.completed) setCompleted(true);
-    })
-    .catch(err => {
-      console.error(err);
-    }); 
+    }
   },[id, lane, gameReset]);
 
   useEffect(() => {
