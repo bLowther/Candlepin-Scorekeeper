@@ -60,7 +60,7 @@ const Reset: FC<ResetProps> = ({ completed, players, initializeGame, stopTimer }
       </div>
       {frames.map(frame=>(
         <div className={"row"} style={{justifyContent: "right"}} key={frame} aria-label="Frame">
-         <div className={activeFrame === frame ? "activeNumber" : "number" } >
+         <div className={activeFrame === frame ? "activeNumber" : "number" }>
            {frame}
          </div>
         </div>
