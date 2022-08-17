@@ -83,7 +83,7 @@ const ModalCom: FC<ModalProps> = ({completed, open, rolledFirstBall, players, in
   return (   
     <Modal show={open} onHide={modal.onCancel}>
     <Modal.Header style={{justifyContent:"center"}}>
-      <Modal.Title>{modal.title}</Modal.Title>
+      <Modal.Title data-testid="title">{modal.title}</Modal.Title>
     </Modal.Header>
     <Modal.Body style={{textAlign:"center"}}>
       <h5>{modal.message}</h5>
