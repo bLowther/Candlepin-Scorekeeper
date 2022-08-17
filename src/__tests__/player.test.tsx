@@ -7,7 +7,8 @@ const testProps = {
   activePlayer: 'test'
 };
 
-test('', () => {
+test('Active player will have a green border', () => {
     render(<PlayersCom  { ...testProps }/>);
-
+    const player = screen.getByText('test');
+    expect(player).toHaveClass('activePlayer');
 });
