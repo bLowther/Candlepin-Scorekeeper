@@ -2,9 +2,9 @@ import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import './App.css';
 import { DefaultApi } from './swagger-generated-client'; 
 import { Frame, Frames, Player } from './core/player';
-import Timer from './componets/timer';
-import PlayersCom from './componets/player';
-import Reset from './componets/reset';
+import Timer from './components/timer';
+import PlayersCom from './components/player';
+import Reset from './components/reset';
 
 function App() {
   
@@ -68,7 +68,7 @@ function App() {
     if(activeTimer){
       const timerID = setInterval(() => {
         updateGameState();
-      }, 1000);
+      }, 500);
       return () => clearInterval(timerID);
   }},[updateGameState, activeTimer]);
 
