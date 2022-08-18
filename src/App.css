@@ -21,3 +21,8 @@ iframe {
 .dev-tool.minimized {
   height: 2rem;
 }
+
+.game {
+  border-style: solid;
+  padding: 5px 15px 5px 0px;
+}

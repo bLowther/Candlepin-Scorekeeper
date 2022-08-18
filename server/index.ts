@@ -11,6 +11,13 @@ const logger = new Logger(Level.DEBUG);
 const app = express();
 const db = new Database();
 db.load();
+
+//Middleware added to overcome CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  next();
+});
+
 app.use(bodyParser.json({ type: 'application/json' }));
 app.get('/health', (req, res) => {
   if (db.ready) {

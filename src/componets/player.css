@@ -1,0 +1,8 @@
+.player, .activePlayer {
+  border-style: solid;
+  height: 2.5vw;
+}
+
+.activePlayer {
+  border-color: green;
+}

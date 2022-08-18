@@ -1,0 +1,14 @@
+.ten, .spare, .strike {
+  border-style: solid;
+  height: 5vw;
+  margin-top: 5px;
+  font-size: 4vh;
+}
+
+.spare {
+  background: linear-gradient(135deg, black 10%, white 0)
+}
+
+.strike {
+  background: linear-gradient(135deg, black 10%, white 0, white 90%, black 10%)
+}
